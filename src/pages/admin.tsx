@@ -1,16 +1,12 @@
 import React from 'react';
-import { StackedPageContext } from '@makes-apps/lib';
 
 import connectors from '../connectors';
 import { Drafts, Managers, Matchups, Seasons, Standings as StandingsView } from '../components';
 import { draftsActions, managersActions, matchupsActions, seasonsActions, standingsActions } from '../store';
 import { Draft, Manager, Matchup, Season, Standings } from '../types';
 
-interface OwnProps {
-  pageContext: StackedPageContext;
-}
-
 interface StateProps {
+  activeMenuKey: string;
   drafts?: { [key: string]: Draft };
   managers?: { [key: string]: Manager };
   matchups?: { [key: string]: Matchup };
@@ -36,22 +32,22 @@ interface DispatchProps {
   saveStandings: (standings: Standings) => Promise<any>;
 }
 
-type Props = OwnProps & StateProps & DispatchProps;
+type Props = StateProps & DispatchProps;
 
 class AdminPage extends React.Component<Props> {
   componentDidMount() {
-    const { fetchDrafts, fetchManagers, /*fetchMatchups,*/ fetchSeasons, fetchStandings, pageContext } = this.props;
+    const { fetchDrafts, fetchManagers, /*fetchMatchups,*/ fetchSeasons, fetchStandings } = this.props;
 
-    pageContext.setPageInfo({
-      menu: [
-        { type: 'view', key: 'managers' },
-        { type: 'view', key: 'matchups' },
-        { type: 'view', key: 'seasons' },
-        { type: 'view', key: 'standings' },
-        { type: 'view', key: 'drafts' },
-      ],
-      activeMenuKey: 'seasons',
-    });
+    // pageContext.setPageInfo({
+    //   menu: [
+    //     { type: 'view', key: 'managers' },
+    //     { type: 'view', key: 'matchups' },
+    //     { type: 'view', key: 'seasons' },
+    //     { type: 'view', key: 'standings' },
+    //     { type: 'view', key: 'drafts' },
+    //   ],
+    //   activeMenuKey: 'seasons',
+    // });
 
     Promise.all([
       fetchManagers({}),
@@ -62,12 +58,13 @@ class AdminPage extends React.Component<Props> {
     ]).catch(err => this.setState(() => ({ error: err })));
   }
 
-  componentWillUnmount() {
-    this.props.pageContext.setPageInfo();
-  }
+  // componentWillUnmount() {
+  //   this.props.pageContext.setPageInfo();
+  // }
 
   render() {
     const {
+      activeMenuKey,
       deleteDraft,
       deleteManager,
       deleteMatchup,
@@ -76,7 +73,6 @@ class AdminPage extends React.Component<Props> {
       drafts,
       managers,
       matchups = {},
-      pageContext: { activeMenuKey },
       seasons,
       standings,
       saveDraft,
@@ -112,6 +108,7 @@ class AdminPage extends React.Component<Props> {
 
 export default connectors.withDispatchObject(
   ({ drafts, managers, matchups, seasons, standings }) => ({
+    activeMenuKey: '',
     drafts: drafts.db,
     managers: managers.db,
     matchups: matchups.db,

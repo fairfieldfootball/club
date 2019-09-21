@@ -68,7 +68,7 @@ const BlogPost = ({ blog, gotoList, removeBlog, user }: Props) => {
       <Banner>
         <BannerBookend>
           <Text as="span">View as:&nbsp;</Text>
-          <Button as="button" color="natural" variant="text" padding="none" onClick={() => setViewAsRaw(!viewAsRaw)}>
+          <Button as="button" color="font" variant="text" padding="none" onClick={() => setViewAsRaw(!viewAsRaw)}>
             {viewAsRaw ? 'markdown' : 'raw'}
           </Button>
         </BannerBookend>

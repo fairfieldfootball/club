@@ -207,6 +207,7 @@ export const convertSeason = factory
           year: leagueMetadata.season,
           start_date: new Date(leagueMetadata.startDate),
           end_date: new Date(leagueMetadata.endDate),
+          draft_date: new Date(),
           recent_week: leagueMetadata.currentWeek,
           commissioner: new BSON.ObjectId('5d44a8c373295704552bbc2e'),
           managers,

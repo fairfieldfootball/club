@@ -65,7 +65,7 @@ const BlogForm = (props: Props) => (
       <ButtonGroup align="left">
         <Button
           as="Link"
-          color="natural"
+          color="font"
           variant="text"
           padding="none"
           to={props.blog ? urls.blogView(props.blog._id.toHexString()) : urls.blog}

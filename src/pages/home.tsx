@@ -1,8 +1,9 @@
 import React from 'react';
-import { Button, StackedPageContext, Text } from '@makes-apps/lib';
+import { Route, RouteComponentProps, Switch } from 'react-router';
+// import { Button, Text } from '@makes-apps/lib';
 
 import connectors from '../connectors';
-import { InSeason, PostSeason, PreSeason } from '../components';
+import { HomePage as Page } from '../components';
 import {
   draftsActions,
   managersActions,
@@ -14,15 +15,15 @@ import {
 import { Draft, Manager, Matchup, Season, Standings, User } from '../types';
 
 interface OwnProps {
-  pageContext: StackedPageContext;
   year: string | number;
 }
 
 interface StateProps {
+  activeMenuKey: string;
   drafts?: { [key: string]: Draft };
   managers?: { [key: string]: Manager };
   matchups?: { [key: string]: Matchup };
-  seasons?: { [key: string]: Season };
+  season?: Season;
   standings?: { [key: string]: Standings };
   user?: User;
 }
@@ -36,102 +37,53 @@ interface DispatchProps {
   fetchUsers: () => Promise<any>;
 }
 
-type Props = OwnProps & StateProps & DispatchProps;
+type Props = OwnProps & StateProps & DispatchProps & RouteComponentProps;
 
-const normalizeYear = (year: string | number) => (typeof year === 'string' ? parseInt(year) : year);
+const renderChildren = ({ match, managers, matchups, season, standings, drafts, user }: Props) => {
+  if (!managers || !matchups || !season || !standings || !drafts || !user) {
+    return 'loading...';
+  }
 
-const PageHeading = () => (
-  <Text size="hecto" noMargin>
-    a{' '}
-    <Button
-      as="a"
-      variant="text"
-      padding="none"
-      size="hecto"
-      href="https://football.fantasysports.yahoo.com/league/myfg"
-      target="_blank"
-      rel="noreferrer"
-    >
-      fantasy football league
-    </Button>{' '}
-    since 2013.
-  </Text>
-);
+  console.log(season);
+
+  return (
+    <Switch>
+      <Route path={`${match.url}/standings`} render={() => 'standings'} />
+      <Route path={`${match.url}/matchups`} render={() => 'matchups'} />
+      <Route path={`${match.url}/scoring`} render={() => 'scoring'} />
+      <Route render={() => 'empty state'} />
+    </Switch>
+  );
+};
 
 class HomePage extends React.Component<Props> {
   componentDidMount() {
-    const { fetchDraft, fetchManagers, fetchMatchups, fetchSeason, fetchStandings, pageContext } = this.props;
+    const { fetchUsers, fetchSeason, fetchManagers, fetchDraft, fetchMatchups, fetchStandings } = this.props;
 
-    pageContext.setPageInfo({
-      byline: <PageHeading />,
-      menu: [
-        { type: 'view', key: 'pre_season', display: 'pre-season' },
-        { type: 'view', key: 'in_season', display: 'season' },
-        { type: 'view', key: 'post_season', display: 'post-season' },
-      ],
-      activeMenuKey: 'pre_season',
-    });
-
-    Promise.all([fetchManagers(), fetchMatchups(), fetchDraft(), fetchSeason(), fetchStandings()]).catch(err =>
-      console.error(err, 'failed to fetch league data')
-    );
-  }
-
-  componentWillUnmount() {
-    this.props.pageContext.setPageInfo();
+    fetchUsers()
+      .then(fetchSeason)
+      .then(() => Promise.all([fetchManagers(), fetchDraft(), fetchMatchups(), fetchStandings()]));
   }
 
   render() {
-    const {
-      managers,
-      matchups,
-      pageContext: { activeMenuKey },
-      seasons,
-      standings,
-      drafts,
-      user,
-      year,
-    } = this.props;
+    const season = this.props.season || { year: 0, recent_week: 0 };
 
-    if (!managers || !matchups || !seasons || !standings || !drafts || !user) {
-      return 'loading...';
-    }
-
-    const normalizedYear = normalizeYear(year);
-    const season = Object.values(seasons).find(season => season.year === normalizedYear);
-
-    if (!season) {
-      return `failed to load season for year ${year}`;
-    }
-
-    const seasonManagerIds: { [key: string]: true } = season.managers.reduce(
-      (acc, { manager_id }) => ({ ...acc, [manager_id.toHexString()]: true }),
-      {}
-    );
-    const seasonManagers = Object.values(managers).filter(({ _id }) => seasonManagerIds[_id.toHexString()]);
-
-    const seasonMatchups = Object.values(matchups).filter(
-      matchup => matchup.season_id.toHexString() === season._id.toHexString()
-    );
+    // const normalizedYear = normalizeYear(year);
+    // const season = Object.values(seasons || {}).find(season => season.year === normalizedYear) || { recent_week: 0 };
 
     return (
-      <>
-        {activeMenuKey === 'pre_season' && (
-          <PreSeason season={season} managers={seasonManagers} matchups={seasonMatchups} />
-        )}
-        {activeMenuKey === 'in_season' && (
-          <InSeason season={season} managers={seasonManagers} matchups={seasonMatchups} />
-        )}
-        {activeMenuKey === 'post_season' && (
-          <PostSeason season={season} managers={seasonManagers} matchups={seasonMatchups} />
-        )}
-      </>
+      <Page year={season.year} week={season.recent_week}>
+        {renderChildren(this.props)}
+      </Page>
     );
   }
 }
 
+const normalizeYear = (year: string | number) => (typeof year === 'string' ? parseInt(year) : year);
+
 export default connectors.withMerge(
   ({ auth, drafts, managers, matchups, seasons, standings }) => ({
+    activeMenuKey: '',
     drafts: drafts.db,
     managers: managers.db,
     matchups: matchups.db,
@@ -147,12 +99,18 @@ export default connectors.withMerge(
     fetchStandings: (query: object) => dispatch<any>(standingsActions.listStandings.creator.worker(query)),
     fetchUsers: () => dispatch<any>(usersActions.listUsers.creator.worker({})),
   }),
-  (stateProps, { fetchDrafts, fetchMatchups, fetchSeasons, fetchStandings, ...dispatchProps }, ownProps: OwnProps) => {
-    const yearQuery = { year: normalizeYear(ownProps.year) };
+  (
+    { seasons, ...stateProps },
+    { fetchDrafts, fetchMatchups, fetchSeasons, fetchStandings, ...dispatchProps },
+    ownProps: OwnProps
+  ) => {
+    const year = normalizeYear(ownProps.year);
+    const yearQuery = { year };
     return {
       ...stateProps,
       ...dispatchProps,
       ...ownProps,
+      season: Object.values(seasons || {}).find(season => season.year === year),
       fetchDraft: () => fetchDrafts(yearQuery),
       fetchMatchups: () => fetchMatchups(yearQuery),
       fetchSeason: () => fetchSeasons(yearQuery),

@@ -1,13 +1,16 @@
+import { BSON } from 'mongodb-stitch-browser-sdk';
+
 import appActions from '../../actions';
+import dbs from '../../dbs';
 import { RootContext, RootState } from '../../root';
-import { YahooState } from '../../types';
+import { LeagueScoreboard, YahooState } from '../../types';
 
 const LEAGUE_KEYS: { [key: number]: string } = {
   2019: '390.l.529959',
 };
 
 const yahooLeagueUrl = (year: number) =>
-  `https://fantasysports.yahooapis.com/fantasy/v2/league/${LEAGUE_KEYS[year]};out=settings,standings,scoreboard`;
+  `https://fantasysports.yahooapis.com/fantasy/v2/league/${LEAGUE_KEYS[year]};out=settings,standings`;
 
 const factory = appActions.app().forNamespace<YahooState>(YahooState.NAMESPACE);
 
@@ -39,7 +42,6 @@ export const fetchLeagueData = factory
         delete newState.meta;
         delete newState.settings;
         delete newState.standings;
-        delete newState.scoreboard;
         delete newState.duration;
         delete newState.error;
 
@@ -49,16 +51,58 @@ export const fetchLeagueData = factory
 
         const { league, time: duration } = fantasy_content;
 
-        const [meta, settings, standings, scoreboard] = league;
+        const [meta, settings, standings] = league;
 
-        return { ...state, meta, settings, standings, scoreboard, duration };
+        return { ...state, meta, settings, standings, duration };
       case 'error':
-        const { message: error } = action.payload;
-
-        return { ...state, error };
+        return { ...state, error: action.payload.message };
     }
 
     return state;
+  });
+
+export const fetchLeagueScoreboard = factory
+  .withType('fetch league scoreboard')
+  .asThunk<[], LeagueScoreboard>(() => (_dispatch, _getState, { stitch }) =>
+    stitch.callFunction('parseLeagueScoreboard', [])
+  )
+  .withReducer((state, action) => {
+    switch (action.status) {
+      case 'starting':
+        const newState = { ...state };
+        delete newState.scoreboard;
+        return newState;
+      case 'success':
+        return { ...state, scoreboard: action.payload };
+      case 'error':
+        return { ...state, error: action.payload.message };
+    }
+    return state;
+  });
+
+export const seedWeeklyMatchups = factory
+  .withType('seed weekly matchups')
+  .asThunk((season_id: BSON.ObjectId) => (_dispatch, getState, stitch) => {
+    const {
+      yahoo: { scoreboard },
+    } = getState();
+    return dbs(stitch)
+      .app()
+      .matchups()
+      .insertMany(
+        scoreboard.matchups.map((matchup: any, index: any) => ({
+          season_id,
+          year: 2019, // TODO
+          week: scoreboard.week,
+          index,
+          start_date: new Date(), // TODO
+          end_date: new Date(),  // TODO
+          playoffs: matchup.is_playoffs,
+          consolation: matchup.is_consolation,
+          away_team: null, // TODO
+          home_team: null, // TODO
+        }))
+      );
   });
 
 const newYahooError = (description?: string | null) =>

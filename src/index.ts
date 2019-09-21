@@ -19,15 +19,7 @@ store.subscribe(
   }, 500)
 );
 
-const renderApp = factory.createRenderer(history, store, 'root', makesTheme =>
-  makesTheme({
-    primaryColor: 'blue',
-    secondaryColor: 'neutral',
-    logoFont: 'Coming Soon, sans-serif',
-    headingFont: 'Permanent Marker, sans-serif',
-    bodyFont: 'Gaegu, serif',
-  })
-);
+const renderApp = factory.createRenderer(history, store, 'root');
 
 registerAuthListener(auth =>
   auth.user

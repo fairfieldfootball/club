@@ -1,6 +1,6 @@
 import React from 'react';
 import Loadable from 'react-loadable';
-import { AuthRoutes, AuthRoute, LoadingPage, StackedPageContext } from '@makes-apps/lib';
+import { AuthRoutes, AuthRoute, LoadingPage } from '@makes-apps/lib';
 
 import { User } from '../types';
 import urls from '../urls';
@@ -75,7 +75,6 @@ interface Props {
   sendConfirmationEmail: (email: string) => Promise<void>;
   sendPasswordResetEmail: (email: string) => Promise<void>;
   confirmEmail: (token: string, tokenId: string) => Promise<void>;
-  pageContext: StackedPageContext;
   resetPassword: (token: string, tokenId: string, password: string) => Promise<void>;
 }
 
@@ -88,16 +87,15 @@ const AppRoutes = ({
   sendPasswordResetEmail,
   confirmEmail,
   resetPassword,
-  pageContext,
 }: Props) => (
   <AuthRoutes redirects={redirects} user={user}>
-    <AuthRoute exact open path={urls.welcome} render={() => <WelcomePage pageContext={pageContext} />} />
-    <AuthRoute exact path={urls.home} render={() => <HomePage pageContext={pageContext} year="2019" />} />
+    <AuthRoute exact open path={urls.welcome} component={WelcomePage} />
+    <AuthRoute exact path={urls.home} render={props => <HomePage {...props} year="2019" />} />
     <AuthRoute path={urls.profile} component={ProfilePage} />} />
     <AuthRoute exact path={urls.me} component={MePage} />
-    <AuthRoute exact path={urls.admin} render={() => <AdminPage pageContext={pageContext} />} />
+    <AuthRoute exact path={urls.admin} component={AdminPage} />
     <AuthRoute path={urls.archive.home} component={ArchivePage} />} />
-    <AuthRoute path={urls.blog} render={props => <BlogPage {...props} pageContext={pageContext} />} />
+    <AuthRoute path={urls.blog} render={props => <BlogPage {...props} />} />
     <AuthRoute exact path={urls.constitution} component={ConstitutionPage} />
     {/* auth routes */}
     <AuthRoute
@@ -107,7 +105,6 @@ const AppRoutes = ({
       render={() => (
         <LoginPage
           login={login}
-          pageContext={pageContext}
           urls={{ register: urls.register, passwordReset: urls.passwordReset, confirmation: urls.confirmation }}
         />
       )}
@@ -118,7 +115,6 @@ const AppRoutes = ({
       render={() => (
         <RegisterPage
           register={register}
-          pageContext={pageContext}
           urls={{ login: urls.login, passwordReset: urls.passwordReset, confirmation: urls.confirmation }}
         />
       )}
@@ -129,7 +125,6 @@ const AppRoutes = ({
       render={() => (
         <EmailConfirmationPage
           sendEmailConfirmation={sendConfirmationEmail}
-          pageContext={pageContext}
           urls={{ login: urls.login, register: urls.register }}
         />
       )}
@@ -140,7 +135,6 @@ const AppRoutes = ({
       render={() => (
         <PasswordResetPage
           sendPasswordReset={sendPasswordResetEmail}
-          pageContext={pageContext}
           urls={{ login: urls.login, register: urls.register }}
           user={user}
         />
@@ -150,12 +144,7 @@ const AppRoutes = ({
       open
       path={urls.confirmEmail}
       render={({ location }) => (
-        <ConfirmEmailPage
-          search={location.search}
-          pageContext={pageContext}
-          confirmEmail={confirmEmail}
-          urls={{ login: urls.login }}
-        />
+        <ConfirmEmailPage search={location.search} confirmEmail={confirmEmail} urls={{ login: urls.login }} />
       )}
     />
     <AuthRoute
@@ -165,7 +154,6 @@ const AppRoutes = ({
         <ResetPasswordPage
           search={location.search}
           resetPassword={resetPassword}
-          pageContext={pageContext}
           urls={{ home: urls.welcome, user: urls.profile }}
         />
       )}

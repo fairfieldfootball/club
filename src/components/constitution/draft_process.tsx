@@ -16,7 +16,7 @@ export default () => (
     <Text decoration="line-through" noMargin>
       Managers will have 90 seconds to select a draft pick in each round
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 23, 2016
     </Text>
     <Text>There is now a 30 second clock for nominations during an auction draft</Text>
@@ -28,7 +28,7 @@ export default () => (
     <Text decoration="line-through" noMargin>
       The draft will be of a "Snake" type where picks are made sequentially and not in auction format
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 23, 2016
     </Text>
     <Text>"I do declare we are an auction league, with no keepies." - Chris "Red Shorts" Banten</Text>

@@ -7,6 +7,7 @@ export interface Season extends BaseDocument {
   end_date: Date;
   recent_week: number;
   commissioner: BSON.ObjectId;
+  draft_date: Date;
   managers: SeasonManager[];
   settings: SeasonSettings;
   scoring: SeasonStatCategory[];

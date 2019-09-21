@@ -24,7 +24,7 @@ export default () => (
           3rd Place in Postseason - 1 Units
         </Text>
       </List>
-      <Text color="neutral" weight="bold" noMargin>
+      <Text color="gray" weight="bold" noMargin>
         UPDATED: August 23, 2016
       </Text>
       <List>

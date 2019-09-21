@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { RouterActions, Text } from '@makes-apps/lib';
+import { Button, RouterActions, Text } from '@makes-apps/lib';
 import queryString from 'querystring';
 
 import connectors from '../connectors';
@@ -14,7 +14,7 @@ import {
   yahooActions,
 } from '../store';
 import { Draft, Manager, Matchup, Season, Standings } from '../types';
-import { YahooLeagueMeta, YahooLeagueSettings, YahooLeagueStandings, YahooLeagueScoreboard } from '../types';
+import { LeagueScoreboard, YahooLeagueMeta, YahooLeagueSettings, YahooLeagueStandings } from '../types';
 import urls from '../urls';
 import { YAHOO_AUTH_URL } from '../yahoo';
 
@@ -31,7 +31,7 @@ interface StateProps {
   prevMatchups?: Matchup[];
   matchups?: Matchup[];
   yahooMeta?: YahooLeagueMeta;
-  yahooScoreboard?: YahooLeagueScoreboard;
+  scoreboard?: LeagueScoreboard;
   yahooSettings?: YahooLeagueSettings;
   yahooStandings?: YahooLeagueStandings;
   search: string;
@@ -39,6 +39,7 @@ interface StateProps {
 
 interface DispatchProps {
   fetchLeagueData: (year: number) => Promise<any>;
+  fetchLeagueScoreboard: () => Promise<any>;
   fetchDrafts: (query: object) => Promise<any>;
   fetchManagers: (query: object) => Promise<any>;
   fetchMatchups: (query: object) => Promise<any>;
@@ -59,6 +60,7 @@ class YahooPage extends React.Component<Props> {
       duration,
       error,
       fetchLeagueData,
+      fetchLeagueScoreboard,
       fetchDrafts,
       fetchManagers,
       fetchMatchups,
@@ -83,6 +85,7 @@ class YahooPage extends React.Component<Props> {
           const weekQuery = { $or: [{ week: prevWeek }, { week }] };
 
           return Promise.all([
+            fetchLeagueScoreboard(),
             fetchManagers({}),
             fetchSeasons(yearQuery),
             fetchDrafts(yearQuery),
@@ -121,7 +124,7 @@ class YahooPage extends React.Component<Props> {
       season,
       yahooMeta,
       yahooSettings,
-      yahooScoreboard,
+      scoreboard,
       yahooStandings,
     } = this.props;
     const parsed = queryString.parse(search);
@@ -134,23 +137,24 @@ class YahooPage extends React.Component<Props> {
       return <>loading...</>;
     }
 
-    if (!yahooMeta || !yahooSettings || !yahooStandings || !yahooScoreboard) {
+    if (!yahooMeta || !yahooSettings || !yahooStandings || !scoreboard) {
       return <>unable to read yahoo data</>;
     }
 
     return (
       <>
         <Text>{`pulled yahoo league data in ${duration}`}</Text>
+        <Button as="button">Seed Weekly Matchups</Button>
         <LeagueCard
           managers={managers}
           season={season}
           saveSeason={saveSeason}
+          scoreboard={scoreboard}
           yahooMeta={yahooMeta}
           yahooSettings={yahooSettings}
           yahooStandings={yahooStandings}
-          yahooScoreboard={yahooScoreboard}
         />
-        <Text as="pre">{JSON.stringify([yahooMeta, yahooSettings, yahooScoreboard, yahooStandings], null, 2)}</Text>
+        <Text as="pre">{JSON.stringify([yahooMeta, yahooSettings, scoreboard, yahooStandings], null, 2)}</Text>
       </>
     );
   }
@@ -197,16 +201,17 @@ export default connectors.withDispatchFunction(
       standings: currStandings,
       prevMatchups,
       matchups: currMatchups,
+      scoreboard: yahoo.scoreboard,
       yahooMeta: yahoo.meta,
       yahooSettings: yahoo.settings,
       yahooStandings: yahoo.standings,
-      yahooScoreboard: yahoo.scoreboard,
       duration: yahoo.duration,
       error: yahoo.error,
     };
   },
   dispatch => ({
     fetchLeagueData: (year: number) => dispatch<any>(yahooActions.fetchLeagueData.creator.worker(year)),
+    fetchLeagueScoreboard: () => dispatch<any>(yahooActions.fetchLeagueScoreboard.creator.worker()),
     fetchDrafts: (query: object) => dispatch<any>(draftsActions.listDrafts.creator.worker(query)),
     fetchManagers: (query: object) => dispatch<any>(managersActions.listManagers.creator.worker(query)),
     fetchMatchups: (query: object) => dispatch<any>(matchupsActions.listMatchups.creator.worker(query)),

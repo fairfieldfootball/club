@@ -4,8 +4,7 @@ export default () => (
   <svg
     preserveAspectRatio="xMidYMid meet"
     viewBox="94.99962392975328 40.06569343065641 319.70818341253334 42"
-    width="319.71"
-    height="42"
+    width="225"
   >
     <defs>
       <path

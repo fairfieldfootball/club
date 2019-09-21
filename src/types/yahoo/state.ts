@@ -1,4 +1,5 @@
-import { YahooLeagueMeta, YahooLeagueSettings, YahooLeagueStandings, YahooLeagueScoreboard } from './dump';
+import { YahooLeagueMeta, YahooLeagueSettings, YahooLeagueStandings } from './dump';
+import { LeagueScoreboard } from './scoreboard';
 
 type Optional<T> = T | undefined;
 
@@ -9,7 +10,7 @@ class State {
     public meta: Optional<YahooLeagueMeta> = undefined,
     public settings: Optional<YahooLeagueSettings> = undefined,
     public standings: Optional<YahooLeagueStandings> = undefined,
-    public scoreboard: Optional<YahooLeagueScoreboard> = undefined,
+    public scoreboard: Optional<LeagueScoreboard> = undefined,
     public duration: string = '',
     public error: string = ''
   ) {}

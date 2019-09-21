@@ -14,7 +14,7 @@ export default () => (
     <Text as="span" decoration="line-through" noMargin>
       The entry fee, which constitues each manager's contributions to the League's prize pool, is $50.
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 12, 2015
     </Text>
     <Text>The entry fee is now set at $125.</Text>
@@ -25,7 +25,7 @@ export default () => (
         The Commish has no interest in signing up for Venmo at this time.
       </Text>
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: June 2014
     </Text>
     <Text>The Commish signed up for Venmo :eyeroll:</Text>
@@ -46,11 +46,11 @@ export default () => (
       </Text>{' '}
       (which is defined as a RB, WR, or a TE), 1 K, and 1 D/ST.
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 13, 2015
     </Text>
     <Text noMargin>Bench sizes have decreased from 7 to 6 resulting in a roster size of 15 total players</Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 31, 2017
     </Text>
     <Text>Instead of 2 RBs, 2 WRs, 1 TE & 1 Flex player; the league mandates 1 RB, 1 WR, 1 TE & 3 Flex players</Text>

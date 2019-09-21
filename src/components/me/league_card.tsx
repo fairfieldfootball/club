@@ -3,10 +3,10 @@ import { styled, styles, Button, Card, CardHeader, CardFooter, Heading, Subheadi
 import { BSON } from 'mongodb-stitch-browser-sdk';
 
 import {
+  LeagueScoreboard,
   Manager,
   Season,
   YahooLeagueMeta,
-  YahooLeagueScoreboard,
   YahooLeagueSettings,
   YahooLeagueStandings,
 } from '../../types';
@@ -18,7 +18,7 @@ interface Props {
   season?: Season;
   saveSeason: (season: Season) => Promise<any>;
   yahooMeta: YahooLeagueMeta;
-  yahooScoreboard: YahooLeagueScoreboard;
+  scoreboard: LeagueScoreboard;
   yahooSettings: YahooLeagueSettings;
   yahooStandings: YahooLeagueStandings;
 }
@@ -50,7 +50,9 @@ const MismatchedText = styled(Text)<{ mismatched: boolean }>(
   styles(css => ({ theme, mismatched }) =>
     mismatched &&
     css({
-      border: `${theme.spacers.pixels.yocto} solid ${theme.colors.danger[5]}`,
+      border: `${theme.spacers.pixels.yocto} solid ${
+        theme.colors.danger[theme.mode === 'light' ? 'dark' : 'light'][5]
+      }`,
     })
   )
 );

@@ -87,6 +87,7 @@ export const newSeason = (
     year: parseInt(meta.season),
     start_date: new Date(meta.start_date),
     end_date: new Date(meta.end_date),
+    draft_date: new Date(),
     recent_week: parseInt(meta.current_week) - 1,
     commissioner: new BSON.ObjectId(managerIds['npm622@yahoo.com']),
     managers,

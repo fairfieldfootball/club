@@ -57,6 +57,7 @@ interface FormData {
   end_date: Date;
   recent_week: string;
   commissioner: any;
+  draft_date: Date;
 }
 
 const numberToString = (value: number) => `${value}`;
@@ -79,16 +80,18 @@ const initialForm = (seasons: { [key: string]: Season }, id: any): FormData => {
       year: '',
       start_date: new Date(),
       end_date: new Date(),
+      draft_date: new Date(),
       recent_week: '',
       commissioner: '',
     };
   }
-  const { _id, year, start_date, end_date, recent_week, commissioner } = seasons[id.toHexString()];
+  const { _id, year, start_date, end_date, draft_date, recent_week, commissioner } = seasons[id.toHexString()];
   return {
     _id,
     year: numberToString(year),
     start_date,
     end_date,
+    draft_date,
     recent_week: numberToString(recent_week),
     commissioner,
   };
@@ -101,6 +104,7 @@ const formToSeason = (data: FormData): Season => ({
   end_date: data.end_date,
   recent_week: tryParseInt(data.recent_week),
   commissioner: data.commissioner,
+  draft_date: data.draft_date,
   managers: [],
   settings: {
     scoring: { type: '', fraction_points: false, negative_points: false },
@@ -204,6 +208,10 @@ export default ({ deleteSeason, seasons, saveSeason }: Props) => {
                   <FormControl>
                     <FormLabel>end date</FormLabel>
                     <FormDatePicker value={data.end_date} onChange={e => setFormField('end_date', e[0])} />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel>draft date</FormLabel>
+                    <FormDatePicker value={data.draft_date} onChange={e => setFormField('draft_date', e[0])} />
                   </FormControl>
                 </FormGroup>
                 <FormControl>

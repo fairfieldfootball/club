@@ -34,7 +34,7 @@ export default () => (
       Once the claim period ends, every team's waiver claims will be executed on a priority basis. If two teams have a
       waiver claim on the same player, the team with a higher priority will receive said player
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 16, 2016
     </Text>
     <Text>
@@ -49,7 +49,7 @@ export default () => (
       </Text>
       , they immediately drop to the bottom of the waiver priority list
     </Text>
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 16, 2016
     </Text>
     <Text>Once a team wins a waiver bid in an amount equal to another team's waiver bid on the same player</Text>

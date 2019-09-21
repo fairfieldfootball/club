@@ -8,7 +8,7 @@ export default () => (
       This has yet to be determined
     </Text>
 
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: December 23, 2014
     </Text>
     <Text decoration="line-through" noMargin>
@@ -16,7 +16,7 @@ export default () => (
       choosing on their wall until another league loser is determined.
     </Text>
 
-    <Text color="neutral" weight="bold" noMargin>
+    <Text color="gray" weight="bold" noMargin>
       UPDATED: August 31, 2017
     </Text>
     <Text>

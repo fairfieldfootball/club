@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { adminActions, Alert, StackedLayout, StackedPageContext, StackedPageInfo } from '@makes-apps/lib';
+import { adminActions, Alert, AppProvider } from '@makes-apps/lib';
 
 import { LongLogo, StackedLogo } from '../components';
 import { authActions } from '../store';
@@ -10,6 +10,8 @@ import urls from '../urls';
 
 import AppRoutes from './routes';
 import { RootState } from '../root';
+
+import Mantra from './mantra';
 
 interface StateProps {
   alerts: Alert[];
@@ -30,18 +32,11 @@ interface DispatchProps {
 
 type Props = StateProps & DispatchProps & RouteComponentProps;
 
-interface State extends StackedPageInfo {}
-
-class AppLayout extends React.Component<Props, State> {
-  readonly state: State = {};
-
-  setPageInfo = (pageInfo: StackedPageInfo = { activeMenuKey: undefined, byline: undefined, menu: undefined }) =>
-    this.setState(() => pageInfo);
-
+class AppLayout extends React.Component<Props> {
   render() {
     const {
       ackAlert,
-      location: { pathname: currentRoute },
+      // location: { pathname: currentRoute },
       login,
       logout,
       register,
@@ -53,8 +48,6 @@ class AppLayout extends React.Component<Props, State> {
       alerts,
       working,
     } = this.props;
-    const { activeMenuKey, byline, menu } = this.state;
-
     const isMe = user && user.type === 'me';
     const isAdmin = user && user.type === 'admin';
 
@@ -72,43 +65,61 @@ class AppLayout extends React.Component<Props, State> {
     nav['blog'] = urls.blog;
     nav['constitution'] = urls.constitution;
 
-    const pageContext: StackedPageContext = {
-      activeMenuKey,
-      setPageInfo: this.setPageInfo,
-      updateMenuKey: activeMenuKey => this.setPageInfo({ activeMenuKey }),
-    };
-
     return (
-      <StackedLayout
-        currentRoute={currentRoute}
-        logo={{
-          to: urls.welcome,
-          img: largeDisplay => (largeDisplay ? <StackedLogo /> : <LongLogo />),
+      <AppProvider
+        name="makes-apps"
+        options={{
+          primaryColor: 'blue',
+          secondaryColor: 'gray',
+          logoFont: 'Coming Soon, sans-serif',
+          headingFont: 'Permanent Marker, sans-serif',
+          bodyFont: 'Gaegu, serif',
         }}
-        working={working}
-        nav={nav}
-        user={user}
-        logout={logout}
-        alerts={alerts}
-        ackAlert={ackAlert}
-        byline={byline}
-        activeMenuKey={activeMenuKey}
-        menu={menu}
-        setMenuKey={pageContext.updateMenuKey}
-        urls={{ login: urls.login }}
       >
-        <AppRoutes
-          redirects={{ standard: urls.login, reverse: urls.home }}
-          user={user}
-          login={login}
-          register={register}
-          sendConfirmationEmail={sendEmailConfirmation}
-          sendPasswordResetEmail={sendPasswordReset}
-          confirmEmail={confirmEmail}
-          resetPassword={resetPassword}
-          pageContext={pageContext}
-        />
-      </StackedLayout>
+        {LayoutProvider => (
+          <LayoutProvider>
+            {({ StackedLayout }) => (
+              <StackedLayout
+                ackAlert={ackAlert}
+                alerts={alerts}
+                credits={[
+                  { icon: 'GithubIcon', href: 'https://github.com/fairfieldfootball/club', text: 'Github' },
+                  { icon: 'MongodbIcon', href: 'https://cloud.mongodb.com', text: 'MongoDB' },
+                ]}
+                loginUrl={urls.login}
+                logo={{
+                  to: urls.welcome,
+                  render: ({ atLeastMega }) => (atLeastMega ? <StackedLogo /> : <LongLogo />),
+                }}
+                logout={logout}
+                mantra={<Mantra />}
+                navbar={[
+                  { to: '/', children: 'home' },
+                  { to: '/archive', children: 'archive' },
+                  { to: '/blogs', children: 'blogs' },
+                  { to: '/constitution', children: 'constitution' },
+                  { to: '/one', children: 'constitution' },
+                  { to: '/two', children: 'constitution' },
+                  { to: '/three', children: 'constitution' },
+                ]}
+                user={user}
+                working={working > 0}
+              >
+                <AppRoutes
+                  redirects={{ standard: urls.login, reverse: urls.home }}
+                  user={user}
+                  login={login}
+                  register={register}
+                  sendConfirmationEmail={sendEmailConfirmation}
+                  sendPasswordResetEmail={sendPasswordReset}
+                  confirmEmail={confirmEmail}
+                  resetPassword={resetPassword}
+                />
+              </StackedLayout>
+            )}
+          </LayoutProvider>
+        )}
+      </AppProvider>
     );
   }
 }

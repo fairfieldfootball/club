@@ -1,6 +1,6 @@
 import React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
-import { RouterActions, StackedPageContext } from '@makes-apps/lib';
+import { RouterActions } from '@makes-apps/lib';
 import { BSON } from 'mongodb-stitch-browser-sdk';
 
 import connectors from '../connectors';
@@ -8,10 +8,6 @@ import { BlogForm, BlogList, BlogView } from '../components';
 import { blogsActions } from '../store';
 import { Blog, User } from '../types';
 import urls from '../urls';
-
-interface OwnProps extends RouteComponentProps {
-  pageContext: StackedPageContext;
-}
 
 interface StateProps {
   blogs?: { [key: string]: Blog };
@@ -25,20 +21,20 @@ interface DispatchProps {
   saveBlog: (blog: Blog) => Promise<any>;
 }
 
-type Props = OwnProps & StateProps & DispatchProps;
+type Props = StateProps & DispatchProps & RouteComponentProps;
 
 class BlogPage extends React.Component<Props> {
   componentDidMount() {
-    const { listBlogs, pageContext } = this.props;
+    const { listBlogs } = this.props;
 
-    pageContext.setPageInfo({ menu: [{ type: 'link', key: urls.blogView('new'), display: 'New Post' }] });
+    // pageContext.setPageInfo({ menu: [{ type: 'link', key: urls.blogView('new'), display: 'New Post' }] });
 
     listBlogs({});
   }
 
-  componentWillUnmount() {
-    this.props.pageContext.setPageInfo();
-  }
+  // componentWillUnmount() {
+  //   this.props.pageContext.setPageInfo();
+  // }
 
   render() {
     const { blogs, goto, match, removeBlog, saveBlog, user } = this.props;
