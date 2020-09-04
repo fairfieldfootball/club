@@ -34,7 +34,7 @@
     "font-awesome": "4.7.0",
     "history": "4.9.0",
     "hoist-non-react-statics": "3.3.0",
-    "markdown-to-jsx": "^6.10.2",
+    "markdown-to-jsx": "^6.11.4",
     "moment": "^2.24.0",
     "mongodb-stitch-browser-sdk": "^4.5.0",
     "query-string": "6.4.2",
