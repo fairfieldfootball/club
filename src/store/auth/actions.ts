@@ -2,9 +2,8 @@ import { adminActions, makesAuthActions } from '@makes-apps/lib';
 import { UserPasswordCredential } from 'mongodb-stitch-browser-sdk';
 
 import { RootContext, RootState } from '../../root';
-import { User } from '../../types';
 
-export default makesAuthActions<RootState, RootContext, User>(
+export default makesAuthActions<RootState, RootContext>(
   'Fairfield Football Club',
   {
     addAlert: adminActions.addAlert.creator.action,

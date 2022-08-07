@@ -1,4 +1,4 @@
-export * from './users';
+export { default as UsersState, User } from './users';
 export * from './yahoo';
 
 export * from './players';

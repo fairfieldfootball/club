@@ -344,7 +344,7 @@ const makeYahooRequests = (
 ): Promise<any[]> =>
   stitch
     .callFunction('makeYahooRequests', [
-      auth.user ? auth.user.email : '',
+      auth.userEmail,
       json ? urls.map(url => `${url}?format=json`) : urls,
       process.env.YAHOO_REDIRECT_URI,
     ])

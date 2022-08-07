@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router';
-import { adminActions, Alert, AppProvider } from '@makes-apps/lib';
+import { adminActions, findUser, Alert, AppProvider, RouterActions } from '@makes-apps/lib';
 
 import { LongLogo, StackedLogo } from '../components';
 import { authActions } from '../store';
@@ -15,12 +15,14 @@ import Mantra from './mantra';
 
 interface StateProps {
   alerts: Alert[];
-  user?: User;
+  userEmail?: string;
+  users?: { [key: string]: User };
   working: number;
 }
 
 interface DispatchProps {
   ackAlert: () => void;
+  goto: (url: string) => void;
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
@@ -36,7 +38,8 @@ class AppLayout extends React.Component<Props> {
   render() {
     const {
       ackAlert,
-      // location: { pathname: currentRoute },
+      goto,
+      location: { pathname: currentRoute },
       login,
       logout,
       register,
@@ -44,26 +47,29 @@ class AppLayout extends React.Component<Props> {
       sendPasswordReset,
       confirmEmail,
       resetPassword,
-      user,
+      userEmail,
+      users = {},
       alerts,
       working,
     } = this.props;
+    const user = findUser(userEmail, users);
+
     const isMe = user && user.type === 'me';
     const isAdmin = user && user.type === 'admin';
 
     const nav: { [key: string]: string } = {};
     if (isMe) {
-      nav['me'] = urls.me;
+      nav[urls.me] = 'me';
     }
 
     if (isMe || isAdmin) {
-      nav['admin'] = urls.admin;
+      nav[urls.admin] = 'admin';
     }
 
-    nav['home'] = urls.home;
-    nav['archive'] = urls.archive.home;
-    nav['blog'] = urls.blog;
-    nav['constitution'] = urls.constitution;
+    nav[urls.home] = 'home';
+    nav[urls.archive.home] = 'archive';
+    nav[urls.blogs.list] = 'blogs';
+    nav[urls.constitution] = 'constitution';
 
     return (
       <AppProvider
@@ -86,6 +92,8 @@ class AppLayout extends React.Component<Props> {
                   { icon: 'GithubIcon', href: 'https://github.com/fairfieldfootball/club', text: 'Github' },
                   { icon: 'MongodbIcon', href: 'https://cloud.mongodb.com', text: 'MongoDB' },
                 ]}
+                currentRoute={currentRoute}
+                emailConfirmationlUrl={urls.confirmation}
                 loginUrl={urls.login}
                 logo={{
                   to: urls.welcome,
@@ -93,21 +101,18 @@ class AppLayout extends React.Component<Props> {
                 }}
                 logout={logout}
                 mantra={<Mantra />}
-                navbar={[
-                  { to: '/', children: 'home' },
-                  { to: '/archive', children: 'archive' },
-                  { to: '/blogs', children: 'blogs' },
-                  { to: '/constitution', children: 'constitution' },
-                  { to: '/one', children: 'constitution' },
-                  { to: '/two', children: 'constitution' },
-                  { to: '/three', children: 'constitution' },
-                ]}
+                navbar={nav}
+                passwordResetUrl={urls.passwordReset}
+                profileUrl={urls.profile}
+                registerUrl={urls.register}
                 user={user}
                 working={working > 0}
               >
                 <AppRoutes
                   redirects={{ standard: urls.login, reverse: urls.home }}
-                  user={user}
+                  userEmail={userEmail}
+                  users={users}
+                  goto={goto}
                   login={login}
                   register={register}
                   sendConfirmationEmail={sendEmailConfirmation}
@@ -124,14 +129,16 @@ class AppLayout extends React.Component<Props> {
   }
 }
 
-const mapStateToProps = ({ admin, auth }: RootState) => ({
+const mapStateToProps = ({ admin, auth, users }: RootState) => ({
   alerts: admin.alerts,
-  user: auth.user,
+  userEmail: auth.userEmail,
+  users: users.db,
   working: admin.working,
 });
 
 const dispatchProps = {
   ackAlert: adminActions.ackAlert.creator.action,
+  goto: RouterActions.goto.creator.worker,
   login: authActions.login.creator.worker,
   logout: authActions.logout.creator.worker,
   register: authActions.register.creator.worker,

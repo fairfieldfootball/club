@@ -1,75 +1,32 @@
 import React from 'react';
-import Loadable from 'react-loadable';
-import { AuthRoutes, AuthRoute, LoadingPage } from '@makes-apps/lib';
+import { Database, Switch, Route, Loadable } from '@makes-apps/lib';
 
 import { User } from '../types';
 import urls from '../urls';
 
-const WelcomePage = Loadable({
-  loader: () => import('../pages').then(module => module.WelcomePage),
-  loading: LoadingPage,
-});
-const HomePage = Loadable({
-  loader: () => import('../pages').then(module => module.HomePage),
-  loading: LoadingPage,
-});
-const ProfilePage = Loadable({
-  loader: () => import('../pages').then(module => module.ProfilePage),
-  loading: LoadingPage,
-});
-const MePage = Loadable({
-  loader: () => import('../pages').then(module => module.MePage),
-  loading: LoadingPage,
-});
-const AdminPage = Loadable({
-  loader: () => import('../pages').then(module => module.AdminPage),
-  loading: LoadingPage,
-});
-const ArchivePage = Loadable({
-  loader: () => import('../pages').then(module => module.ArchivePage),
-  loading: LoadingPage,
-});
-const BlogPage = Loadable({
-  loader: () => import('../pages').then(module => module.BlogPage),
-  loading: LoadingPage,
-});
-const ConstitutionPage = Loadable({
-  loader: () => import('../pages').then(module => module.ConstitutionPage),
-  loading: LoadingPage,
-});
-const LoginPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.StackedLoginPage),
-  loading: LoadingPage,
-});
-const RegisterPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.StackedRegisterPage),
-  loading: LoadingPage,
-});
-const EmailConfirmationPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.StackedEmailConfirmationPage),
-  loading: LoadingPage,
-});
-const PasswordResetPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.StackedPasswordResetPage),
-  loading: LoadingPage,
-});
-const ConfirmEmailPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.StackedConfirmEmailPage),
-  loading: LoadingPage,
-});
-const ResetPasswordPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.StackedResetPasswordPage),
-  loading: LoadingPage,
-});
-
-const NotFoundPage = Loadable({
-  loader: () => import('@makes-apps/lib').then(module => module.NotFoundPage),
-  loading: LoadingPage,
-});
+const WelcomePage = Loadable(() => import('../pages').then(module => module.WelcomePage));
+const HomePage = Loadable(() => import('../pages').then(module => module.HomePage));
+const ProfilePage = Loadable(() => import('../pages').then(module => module.ProfilePage));
+const MePage = Loadable(() => import('../pages').then(module => module.MePage));
+const AdminPage = Loadable(() => import('../pages').then(module => module.AdminPage));
+const ArchivePage = Loadable(() => import('../pages').then(module => module.ArchivePage));
+const BlogsPage = Loadable(() => import('../pages').then(module => module.BlogsPage));
+const ConstitutionPage = Loadable(() => import('../pages').then(module => module.ConstitutionPage));
+const LoginPage = Loadable(() => import('@makes-apps/lib').then(module => module.StackedLoginPage));
+const RegisterPage = Loadable(() => import('@makes-apps/lib').then(module => module.StackedRegisterPage));
+const EmailConfirmationPage = Loadable(() =>
+  import('@makes-apps/lib').then(module => module.StackedEmailConfirmationPage)
+);
+const PasswordResetPage = Loadable(() => import('@makes-apps/lib').then(module => module.StackedPasswordResetPage));
+const ConfirmEmailPage = Loadable(() => import('@makes-apps/lib').then(module => module.StackedConfirmEmailPage));
+const ResetPasswordPage = Loadable(() => import('@makes-apps/lib').then(module => module.StackedResetPasswordPage));
+const NotFoundPage = Loadable(() => import('@makes-apps/lib').then(module => module.NotFoundPage));
 
 interface Props {
   redirects: { standard: string; reverse: string };
-  user?: User;
+  userEmail?: string;
+  users: Database<User>;
+  goto: (url: string) => void;
   login: (email: string, password: string) => Promise<any>;
   register: (email: string, password: string) => Promise<void>;
   sendConfirmationEmail: (email: string) => Promise<void>;
@@ -79,8 +36,9 @@ interface Props {
 }
 
 const AppRoutes = ({
-  redirects,
-  user,
+  userEmail,
+  users,
+  goto,
   login,
   register,
   sendConfirmationEmail,
@@ -88,29 +46,30 @@ const AppRoutes = ({
   confirmEmail,
   resetPassword,
 }: Props) => (
-  <AuthRoutes redirects={redirects} user={user}>
-    <AuthRoute exact open path={urls.welcome} component={WelcomePage} />
-    <AuthRoute exact path={urls.home} render={props => <HomePage {...props} year="2019" />} />
-    <AuthRoute path={urls.profile} component={ProfilePage} />} />
-    <AuthRoute exact path={urls.me} component={MePage} />
-    <AuthRoute exact path={urls.admin} component={AdminPage} />
-    <AuthRoute path={urls.archive.home} component={ArchivePage} />} />
-    <AuthRoute path={urls.blog} render={props => <BlogPage {...props} />} />
-    <AuthRoute exact path={urls.constitution} component={ConstitutionPage} />
+  <Switch homeUrl={urls.home} loginUrl={urls.login} userEmail={userEmail} users={users}>
+    <Route exact access="open" path={urls.welcome} component={WelcomePage} />
+    <Route exact path={urls.home} render={props => <HomePage {...props} year={2019} />} />
+    <Route path={urls.profile} component={ProfilePage} />} />
+    <Route exact path={urls.me} component={MePage} />
+    <Route exact path={urls.admin} component={AdminPage} />
+    <Route path={urls.archive.home} component={ArchivePage} />} />
+    <Route path={urls.blogs.list} render={props => <BlogsPage {...props} />} />
+    <Route exact path={urls.constitution} component={ConstitutionPage} />
     {/* auth routes */}
-    <AuthRoute
-      reverse
+    <Route
+      access="reverse"
       redirectTo={urls.welcome}
       path={urls.login}
       render={() => (
         <LoginPage
+          goto={goto}
           login={login}
           urls={{ register: urls.register, passwordReset: urls.passwordReset, confirmation: urls.confirmation }}
         />
       )}
     />
-    <AuthRoute
-      reverse
+    <Route
+      access="reverse"
       path={urls.register}
       render={() => (
         <RegisterPage
@@ -119,8 +78,8 @@ const AppRoutes = ({
         />
       )}
     />
-    <AuthRoute
-      reverse
+    <Route
+      access="reverse"
       path={urls.confirmation}
       render={() => (
         <EmailConfirmationPage
@@ -129,26 +88,26 @@ const AppRoutes = ({
         />
       )}
     />
-    <AuthRoute
-      open
+    <Route
+      access="open"
       path={urls.passwordReset}
       render={() => (
         <PasswordResetPage
           sendPasswordReset={sendPasswordResetEmail}
           urls={{ login: urls.login, register: urls.register }}
-          user={user}
+          userEmail={userEmail}
         />
       )}
     />
-    <AuthRoute
-      open
+    <Route
+      access="open"
       path={urls.confirmEmail}
       render={({ location }) => (
         <ConfirmEmailPage search={location.search} confirmEmail={confirmEmail} urls={{ login: urls.login }} />
       )}
     />
-    <AuthRoute
-      open
+    <Route
+      access="open"
       path={urls.resetPassword}
       render={({ location }) => (
         <ResetPasswordPage
@@ -158,8 +117,8 @@ const AppRoutes = ({
         />
       )}
     />
-    <AuthRoute component={NotFoundPage} />
-  </AuthRoutes>
+    <Route component={NotFoundPage} />
+  </Switch>
 );
 
 export default AppRoutes;

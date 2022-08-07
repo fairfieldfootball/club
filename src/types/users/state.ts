@@ -2,8 +2,8 @@ import { BaseMongoCrudState } from '@makes-apps/lib';
 
 import { User } from './user';
 
-class UsersState extends BaseMongoCrudState<User> {
+class State extends BaseMongoCrudState<User> {
   static NAMESPACE = 'users';
 }
 
-export default UsersState;
+export default State;

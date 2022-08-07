@@ -22,7 +22,6 @@
   "dependencies": {
     "@emotion/core": "^10.0.10",
     "@emotion/styled": "^10.0.10",
-    "@makes-apps/lib": "file:.yalc/@makes-apps/lib",
     "chroma-js": "^2.0.3",
     "classnames": "2.2.6",
     "connected-react-router": "6.4.0",

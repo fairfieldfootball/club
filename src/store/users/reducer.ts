@@ -1,6 +1,6 @@
 import { makesSliceReducer } from '@makes-apps/lib';
 
-import { UsersState } from '../../types';
+import { UsersState } from '../../types/users';
 
 import * as actions from './actions';
 

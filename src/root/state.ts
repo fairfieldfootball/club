@@ -8,7 +8,6 @@ import {
   SeasonsState,
   StandingsState,
   UsersState,
-  User,
   YahooState,
 } from '../types';
 
@@ -17,7 +16,7 @@ import APP_LOCAL_KEY from './local_key';
 const initialState = LocalAppState.read(APP_LOCAL_KEY);
 
 const AppState = makesAppState({
-  auth: new AuthState<User>(initialState.user),
+  auth: new AuthState(initialState.user),
   blog: new BlogsState(),
   drafts: new DraftsState(),
   managers: new ManagersState(),

@@ -1,6 +1,6 @@
 {
   "name": "@makes-apps/lib",
-  "version": "0.0.47-03d3a3fa",
+  "version": "0.0.47-6e1ddc42",
   "description": "an app factory",
   "author": "nick makes",
   "license": "MIT",
@@ -20,6 +20,7 @@
     "dist"
   ],
   "dependencies": {
+    "@makes-apps/lib": "file:.yalc/@makes-apps/lib",
     "flatpickr": "^4.6.2",
     "react-flatpickr": "^3.9.0"
   }

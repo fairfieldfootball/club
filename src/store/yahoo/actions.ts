@@ -96,7 +96,7 @@ export const seedWeeklyMatchups = factory
           week: scoreboard.week,
           index,
           start_date: new Date(), // TODO
-          end_date: new Date(),  // TODO
+          end_date: new Date(), // TODO
           playoffs: matchup.is_playoffs,
           consolation: matchup.is_consolation,
           away_team: null, // TODO
@@ -116,7 +116,7 @@ const makeYahooRequests = (
 ): Promise<any[]> =>
   stitch
     .callFunction('makeYahooRequests', [
-      auth.user ? auth.user.email : '',
+      auth.userEmail,
       json ? urls.map(url => `${url}?format=json`) : urls,
       process.env.YAHOO_REDIRECT_URI,
     ])

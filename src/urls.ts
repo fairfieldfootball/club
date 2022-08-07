@@ -22,9 +22,12 @@ export default {
     },
   },
 
-  blog: '/blog',
-  blogView: (blogId = ':blogId') => `/blog/${blogId}`,
-  blogEdit: (blogId = ':blogId') => `/blog/${blogId}/edit`,
+  blogs: {
+    list: '/blogs',
+    new: '/blogs/new',
+    view: (blogId = ':blogId') => `/blogs/${blogId}`,
+    edit: (blogId = ':blogId') => `/blogs/${blogId}/edit`,
+  },
 
   constitution: '/constitution',
 
